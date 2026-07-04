@@ -1,0 +1,497 @@
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const { GoogleGenAI } = require("@google/genai");
+const { PrismaClient } = require("@prisma/client");
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const authMiddleware = require("./middleware/authMiddleware");
+const roleMiddleware = require("./middleware/roleMiddleware");
+
+const app = express();
+const prisma = new PrismaClient();
+
+// GEMINI AI
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+app.use(cors());
+app.use(express.json());
+
+
+// =====================
+// HOME ROUTE
+// =====================
+app.get("/", (req, res) => {
+  res.status(200).send("AgriConnect Backend Running 🚀");
+});
+
+// =====================
+// GET ALL USERS
+// =====================
+app.get("/users", async (req, res) => {
+  try {
+
+    const users = await prisma.user.findMany();
+
+    res.status(200).json(users);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+});
+
+// =====================
+// ADD USER
+// =====================
+app.post("/users", async (req, res) => {
+
+  console.log(req.body);
+
+  try {
+
+    const {
+      name,
+      email,
+      password,
+      phone,
+      village,
+      role
+    } = req.body;
+
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !phone ||
+      !role
+    ) {
+      return res.status(400).json({
+        message: "All required fields are required"
+      });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email
+      }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email already exists"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+const user = await prisma.user.create({
+  data: {
+    name,
+    email,
+    password: hashedPassword,
+    phone,
+    village,
+    role
+  }
+});
+
+    res.status(201).json({
+      message: "User created successfully",
+      user
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+
+// =====================
+// LOGIN USER
+// =====================
+app.post("/login", async (req, res) => {
+
+  try {
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and Password are required"
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid Email"
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid Password"
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    res.status(200).json({
+      message: "Login Successful",
+      token,
+      user
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+
+// =====================
+// GET ALL PRODUCTS
+// =====================
+app.get("/products", async (req, res) => {
+  try {
+
+    const products = await prisma.product.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            village: true,
+            role: true,
+            createdAt: true
+          }
+        }
+      }
+    });
+
+    res.status(200).json(products);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+});
+
+// =====================
+// SEARCH PRODUCT
+// =====================
+app.get("/products/search", async (req, res) => {
+
+  try {
+
+    const q = req.query.q || "";
+
+    const products = await prisma.product.findMany({
+      where: {
+        name: {
+          contains: q,
+          mode: "insensitive"
+        }
+      },
+      include: {
+        user: true
+      }
+    });
+
+    res.status(200).json(products);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+
+// =====================
+// GET SINGLE PRODUCT
+// =====================
+app.get("/products/:id", async (req, res) => {
+
+  try {
+
+    const id = parseInt(req.params.id);
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: id
+      },
+      include: {
+        user: true
+      }
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    res.status(200).json(product);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+
+// =====================
+// ADD PRODUCT
+// =====================
+app.post(
+  "/products",
+  authMiddleware,
+  roleMiddleware("FARMER"),
+  async (req, res) => {
+  try {
+
+    const {
+      name,
+      category,
+      description,
+      price,
+      quantity,
+      image,
+      userId
+    } = req.body;
+
+    const product = await prisma.product.create({
+      data: {
+        name,
+        category,
+        description,
+        price,
+        quantity,
+        image,
+        userId
+      }
+    });
+
+    res.status(201).json(product);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+});
+
+// =====================
+// UPDATE PRODUCT
+// =====================
+app.put("/products/:id", authMiddleware, async (req, res) => {
+
+  try {
+
+    const id = parseInt(req.params.id);
+
+    const existingProduct = await prisma.product.findUnique({
+  where: {
+    id
+  }
+});
+
+if (!existingProduct) {
+  return res.status(404).json({
+    message: "Product not found"
+  });
+}
+
+if (existingProduct.userId !== req.user.id) {
+  return res.status(403).json({
+    message: "You can update only your own products"
+  });
+}
+
+    const {
+      name,
+      category,
+      description,
+      price,
+      quantity,
+      image,
+      userId
+    } = req.body;
+
+    const product = await prisma.product.update({
+      where: {
+        id
+      },
+      data: {
+        name,
+        category,
+        description,
+        price,
+        quantity,
+        image,
+        userId
+      }
+    });
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+// =====================
+// DELETE PRODUCT
+// =====================
+app.delete("/products/:id", authMiddleware, async (req, res) => {
+
+  try {
+
+    const id = parseInt(req.params.id);
+
+    const existingProduct = await prisma.product.findUnique({
+  where: {
+    id
+  }
+});
+
+if (!existingProduct) {
+  return res.status(404).json({
+    message: "Product not found"
+  });
+}
+
+if (existingProduct.userId !== req.user.id) {
+  return res.status(403).json({
+    message: "You can delete only your own products"
+  });
+}
+
+    await prisma.product.delete({
+      where: {
+        id
+      }
+    });
+
+    res.status(200).json({
+      message: "Product deleted successfully"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error"
+    });
+
+  }
+
+});
+
+// =====================
+// AI ASSISTANT
+// =====================
+app.post("/ai", async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        message: "Question is required",
+      });
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: message,
+    });
+
+    res.status(200).json({
+      reply: response.text,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "AI Error",
+    });
+  }
+});
+
+// =====================
+// START SERVER
+// =====================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
