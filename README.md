@@ -186,3 +186,38 @@ Supabase provides a free PostgreSQL database with cloud storage and easy integra
 1. Clone the repository.
 
 2. Install dependencies:
+
+3. Create a `.env` file.
+
+4. Add required variables:
+  
+5. Start backend server:
+
+6. Run frontend:
+
+AgriConnect
+│
+├── app
+│ ├── login
+│ ├── register
+│ └── dashboard
+│
+├── backend
+│ ├── server.js
+│ ├── prisma
+│ ├── routes
+│ ├── controllers
+│ └── passportConfig.js
+│
+└── components
+
+---
+
+# Future Improvements
+
+- Online payment integration
+- Weather prediction
+- Crop disease detection
+- Real-time market prices
+- Mobile application
+
