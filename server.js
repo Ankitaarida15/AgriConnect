@@ -1,16 +1,28 @@
+const session = require("express-session");
+const passport = require("./passportConfig");
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 const { GoogleGenAI } = require("@google/genai");
 const { PrismaClient } = require("@prisma/client");
 
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
 
 const authMiddleware = require("./middleware/authMiddleware");
 const roleMiddleware = require("./middleware/roleMiddleware");
 
 const app = express();
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts allowed
+  message: {
+    message: "Too many login attempts. Try again after 15 minutes."
+  }
+});
 const prisma = new PrismaClient();
 
 // GEMINI AI
@@ -18,8 +30,22 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
+
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 // =====================
@@ -33,6 +59,7 @@ app.get("/", (req, res) => {
 // GET ALL USERS
 // =====================
 app.get("/users", async (req, res) => {
+
   try {
 
     const users = await prisma.user.findMany();
@@ -53,9 +80,27 @@ app.get("/users", async (req, res) => {
 // =====================
 // ADD USER
 // =====================
-app.post("/users", async (req, res) => {
+app.post(
+  "/users",
+  [
+    body("name").notEmpty().withMessage("Name is required"),
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters"),
+    body("phone").notEmpty().withMessage("Phone is required"),
+    body("role").notEmpty().withMessage("Role is required"),
+  ],
+  async (req, res) => {
 
   console.log(req.body);
+const errors = validationResult(req);
+
+if (!errors.isEmpty()) {
+  return res.status(400).json({
+    errors: errors.array(),
+  });
+}
 
   try {
 
@@ -125,7 +170,7 @@ const user = await prisma.user.create({
 // =====================
 // LOGIN USER
 // =====================
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
 
   try {
 
@@ -302,41 +347,41 @@ app.post(
   authMiddleware,
   roleMiddleware("FARMER"),
   async (req, res) => {
+    console.log("User:", req.user);
+console.log("Body:", req.body);
   try {
 
     const {
-      name,
-      category,
-      description,
-      price,
-      quantity,
-      image,
-      userId
-    } = req.body;
+  name,
+  category,
+  description,
+  price,
+  quantity,
+  image
+} = req.body;
 
     const product = await prisma.product.create({
-      data: {
-        name,
-        category,
-        description,
-        price,
-        quantity,
-        image,
-        userId
-      }
+    data: {
+  name,
+  category,
+  description,
+  price,
+  quantity,
+  image,
+  userId: req.user.id
+}  
     });
 
     res.status(201).json(product);
 
-  } catch (error) {
+  } 
+  catch (error) {
+  console.error(error);
 
-    console.error(error);
-
-    res.status(500).json({
-      message: "Internal Server Error"
-    });
-
-  }
+  res.status(500).json({
+    message: error.message,
+  });
+}
 });
 
 // =====================
@@ -345,6 +390,10 @@ app.post(
 app.put("/products/:id", authMiddleware, async (req, res) => {
 
   try {
+
+console.log("User:", req.user);
+console.log("Body:", req.body);
+console.log("Product ID:", req.params.id);
 
     const id = parseInt(req.params.id);
 
@@ -381,14 +430,14 @@ if (existingProduct.userId !== req.user.id) {
         id
       },
       data: {
-        name,
-        category,
-        description,
-        price,
-        quantity,
-        image,
-        userId
-      }
+  name,
+  category,
+  description,
+  price: Number(price),
+  quantity: Number(quantity),
+  image
+}
+      
     });
 
     res.status(200).json({
@@ -457,6 +506,62 @@ if (existingProduct.userId !== req.user.id) {
 });
 
 // =====================
+// PLACE ORDER
+// =====================
+app.post("/orders", authMiddleware, async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: Number(productId),
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    if (product.quantity < quantity) {
+      return res.status(400).json({
+        message: "Insufficient stock",
+      });
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        buyerId: req.user.id,
+        productId: product.id,
+        quantity: Number(quantity),
+        totalPrice: product.price * Number(quantity),
+      },
+    });
+
+    await prisma.product.update({
+      where: {
+        id: product.id,
+      },
+      data: {
+        quantity: product.quantity - Number(quantity),
+      },
+    });
+
+    res.status(201).json({
+      message: "Order Placed Successfully",
+      order,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
+// =====================
 // AI ASSISTANT
 // =====================
 app.post("/ai", async (req, res) => {
@@ -487,6 +592,38 @@ app.post("/ai", async (req, res) => {
   }
 });
 
+// =====================
+// GOOGLE LOGIN
+// =====================
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  (req, res) => {
+    const token = jwt.sign(
+      {
+        id: req.user.id,
+        role: req.user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.redirect(`http://localhost:3000/login?token=${token}`);
+  }
+);
 // =====================
 // START SERVER
 // =====================

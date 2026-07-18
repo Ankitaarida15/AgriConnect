@@ -31,7 +31,7 @@ model User {
   createdAt DateTime @default(now())
 
   products Product[]
-  orders   Order[]
+  orders Order[] @relation("BuyerOrders")
 }
 
 model Product {
@@ -50,6 +50,7 @@ model Product {
   orders Order[]
 }
 
+
 model Order {
   id         Int         @id @default(autoincrement())
   quantity   Int
@@ -57,9 +58,9 @@ model Order {
   status     OrderStatus @default(PENDING)
   createdAt  DateTime    @default(now())
 
-  buyerId Int
-  buyer   User @relation(fields: [buyerId], references: [id])
+  buyerId    Int
+  buyer      User @relation("BuyerOrders", fields: [buyerId], references: [id])
 
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  productId  Int
+  product    Product @relation(fields: [productId], references: [id])
 }
