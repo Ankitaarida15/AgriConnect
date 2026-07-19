@@ -1,3 +1,6 @@
+const path = require("path");
+const multer = require("multer");
+const fs = require("fs");
 const session = require("express-session");
 const passport = require("./passportConfig");
 const express = require("express");
@@ -24,6 +27,10 @@ const loginLimiter = rateLimit({
   }
 });
 const prisma = new PrismaClient();
+
+const upload = multer({
+  dest: "uploads/",
+});
 
 // GEMINI AI
 const ai = new GoogleGenAI({
@@ -565,21 +572,61 @@ app.post("/orders", authMiddleware, async (req, res) => {
 // =====================
 // AI ASSISTANT
 // =====================
-app.post("/ai", async (req, res) => {
+app.post("/ai", upload.single("image"), async (req, res) => {
   try {
-    const { message } = req.body;
+    const message = req.body.message;
+
+    let prompt = message;
+    let imagePart = null;
+
+if (req.file) {
+  const imageBuffer = fs.readFileSync(req.file.path);
+
+  imagePart = {
+    inlineData: {
+      mimeType: req.file.mimetype,
+      data: imageBuffer.toString("base64"),
+    },
+  };
+}
+
+if (req.file) {
+  prompt =
+    message +
+    "\n\nAnalyze this crop image. Tell:\n" +
+    "1. Crop Name\n" +
+    "2. Disease (if any)\n" +
+    "3. Treatment\n" +
+    "4. Fertilizer Suggestion\n" +
+    "5. Watering Tips";
+}
 
     if (!message) {
       return res.status(400).json({
         message: "Question is required",
       });
     }
+const contents = imagePart
+  ? [
+      imagePart,
+      {
+        text:
+          prompt +
+          "\n\nAnalyze this agriculture image. Tell:\n" +
+          "1. Crop Name\n" +
+          "2. Disease (if visible)\n" +
+          "3. Treatment\n" +
+          "4. Fertilizer Recommendation\n" +
+          "5. Watering Tips",
+      },
+    ]
+  : prompt;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: message,
-    });
-
+const response = await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents,
+});
+    
     res.status(200).json({
       reply: response.text,
     });
