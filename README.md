@@ -260,3 +260,20 @@ AgriConnect
 - Mobile application
 
 >>>>>>> 7c705c496a9d60b78cec0a10c84b8d42be517d27
+
+---
+
+# Week 7 — AI API Integration
+
+## Work Completed
+
+- Integrated Google Gemini API
+- Created AI Chat page
+- Connected frontend with backend AI endpoint
+- Added loading state while AI generates response
+- Added error handling
+- Stored API key securely using .env
+
+## AI Feature
+
+Users can ask agriculture-related questions and receive AI-powered responses using Google Gemini.
