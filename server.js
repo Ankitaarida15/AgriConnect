@@ -75,14 +75,12 @@ app.get("/users", async (req, res) => {
     res.status(200).json(users);
 
   } catch (error) {
-
-    console.error(error);
+    console.error("AI ERROR DETAILS:", error);
 
     res.status(500).json({
-      message: "Internal Server Error"
+      message: error.message,
     });
-
-  }
+}
 });
 
 // =====================
@@ -627,6 +625,10 @@ const response = await ai.models.generateContent({
   contents,
 });
     
+if (req.file) {
+  fs.unlinkSync(req.file.path);
+}
+
     res.status(200).json({
       reply: response.text,
     });
