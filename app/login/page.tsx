@@ -24,8 +24,8 @@ const [form, setForm] = useState({
 
   const handleLogin = async () => {
   try {
-    const response = await fetch("http://localhost:5000/login", {
-      method: "POST",
+const response = await fetch("https://agriconnect-x8no.onrender.com/login", {
+        method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -89,7 +89,7 @@ const [form, setForm] = useState({
           Login
         </button>
 
-        <a href="http://localhost:5000/auth/google">
+        <a href="https://agriconnect-x8no.onrender.com/auth/google">
   <button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">
     Continue with Google
   </button>

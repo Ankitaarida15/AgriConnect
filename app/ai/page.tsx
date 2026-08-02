@@ -58,8 +58,7 @@ const sendMessage = async () => {
     formData.append("image", image);
   }
 
-  const res = await fetch("http://localhost:5000/ai", {
-    method: "POST",
+const res = await fetch("https://agriconnect-x8no.onrender.com/ai", {    method: "POST",
     body: formData,
   });
 

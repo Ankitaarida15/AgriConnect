@@ -184,8 +184,8 @@ function Dashboard() {
             setProductsLoading(true);
 const url =
   search.trim() === ""
-    ? "http://localhost:5000/products"
-    : `http://localhost:5000/products/search?q=${search}`;            const res = await fetch(url, {
+    ? "https://agriconnect-x8no.onrender.com/products"
+    : `https://agriconnect-x8no.onrender.com/products/search?q=${search}`;            const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -225,7 +225,7 @@ const url =
             return;
         }
         try {
-            const res = await fetch("http://localhost:5000/products", {
+            const res = await fetch("https://agriconnect-x8no.onrender.com/products", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -266,8 +266,8 @@ const url =
             return;
         }
         try {
-            const res = await fetch(`http://localhost:5000/products/${editId}`, {
-                method: "PUT",
+           const res = await fetch(`https://agriconnect-x8no.onrender.com/products/${editId}`, {
+    method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -291,6 +291,7 @@ const url =
                 setImage("");
                 setEditId(null);
                 fetchProducts();
+            
             } else {
                 const data = await res.json();
                 console.log("Update Error:", data);
@@ -303,8 +304,8 @@ const url =
     // ❌ DELETE PRODUCT
     const deleteProduct = async (id)=>{
         try {
-            const res = await fetch(`http://localhost:5000/products/${id}`, {
-                method: "DELETE",
+const res = await fetch(`https://agriconnect-x8no.onrender.com/products/${id}`, {
+    method: "DELETE",   
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -322,7 +323,7 @@ const url =
     // 🛒 BUY PRODUCT
     const buyProduct = async (productId)=>{
         try {
-            const res = await fetch("http://localhost:5000/orders", {
+            const res = await fetch("https://agriconnect-x8no.onrender.com/orders", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -355,7 +356,7 @@ const url =
             const formData = new FormData();
             formData.append("image", cropFile);
             formData.append("message", "Analyze this crop image");
-            const res = await fetch("http://localhost:5000/ai", {
+            const res = await fetch("https://agriconnect-x8no.onrender.com/ai", {
                 method: "POST",
                 body: formData
             });

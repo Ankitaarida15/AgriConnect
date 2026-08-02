@@ -28,8 +28,8 @@ const fetchProducts = async () => {
 
     const url =
   search.trim() === ""
-    ? "http://localhost:5000/products"
-    : `http://localhost:5000/products/search?q=${search}`;
+    ? "https://agriconnect-x8no.onrender.com/products"
+    : `https://agriconnect-x8no.onrender.com/products/search?q=${search}`;
 
 const res = await fetch(url, {
   headers: {
@@ -88,8 +88,7 @@ useEffect(() => {
  return;
 }
   try {
-    const res = await fetch("http://localhost:5000/products", {
-      method: "POST",
+const res = await fetch("https://agriconnect-x8no.onrender.com/products", {      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -142,8 +141,7 @@ useEffect(() => {
 
   try {
     const res = await fetch(
-      `http://localhost:5000/products/${editId}`,
-      {
+`https://agriconnect-x8no.onrender.com/products/${editId}`,      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -186,8 +184,7 @@ useEffect(() => {
   const deleteProduct = async (id: number) => {
   try {
     const res = await fetch(
-      `http://localhost:5000/products/${id}`,
-      {
+`https://agriconnect-x8no.onrender.com/products/${id}`,      {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -208,8 +205,8 @@ useEffect(() => {
 // 🛒 BUY PRODUCT
 const buyProduct = async (productId: number) => {
   try {
-    const res = await fetch("http://localhost:5000/orders", {
-      method: "POST",
+const res = await fetch("https://agriconnect-x8no.onrender.com/orders", {
+        method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -258,7 +255,7 @@ const analyzeCrop = async () => {
 
 
     const res = await fetch(
-      "http://localhost:5000/ai",
+      "https://agriconnect-x8no.onrender.com/ai",
       {
         method: "POST",
         body: formData,

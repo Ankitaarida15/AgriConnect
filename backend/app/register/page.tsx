@@ -17,8 +17,8 @@ export default function Register() {
 
   const handleRegister = async () => {
   try {
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
+const response = await fetch("https://agriconnect-x8no.onrender.com/users", {
+        method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
