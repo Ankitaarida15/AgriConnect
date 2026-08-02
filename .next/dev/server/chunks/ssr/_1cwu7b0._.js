@@ -182,8 +182,10 @@ function Dashboard() {
     const fetchProducts = async ()=>{
         try {
             setProductsLoading(true);
-            const url = search.trim() === "" ? "http://localhost:5000/products" : `http://localhost:5000/products/search?q=${search}`;
-            const res = await fetch(url, {
+const url =
+  search.trim() === ""
+    ? "http://localhost:5000/products"
+    : `http://localhost:5000/products/search?q=${search}`;            const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
