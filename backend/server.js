@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "backend/.env.local" });
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
