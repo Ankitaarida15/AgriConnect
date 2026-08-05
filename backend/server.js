@@ -41,10 +41,13 @@ const ai = new GoogleGenAI({
 });
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://agri-connect-pp2d.vercel.app",
+  ],
   credentials: true,
 }));
-
+ 
 app.use(express.json());
 
 app.use(
@@ -674,12 +677,12 @@ app.get(
       }
     );
 
-    res.redirect(`http://localhost:3000/login?token=${token}`);
+    res.redirect(`https://agri-connect-pp2d.vercel.app/login?token=${token}`);
   }
 );
-// =====================
+
 // START SERVER
-// =====================
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

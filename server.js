@@ -671,7 +671,7 @@ app.get(
       }
     );
 
-    res.redirect(`http://localhost:3000/login?token=${token}`);
+    res.redirect(`https://agriconnect-xyz.vercel.app/login?token=${token}`);
   }
 );
 // =====================
