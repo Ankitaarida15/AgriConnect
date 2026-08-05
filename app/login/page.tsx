@@ -33,16 +33,21 @@ const response = await fetch("https://agriconnect-x8no.onrender.com/login", {
     });
 
     const data = await response.json();
+console.log("Login Response:", data);
 
     if (response.ok) {
-      localStorage.setItem("token", data.token);
+  localStorage.setItem("token", data.token);
 
-      alert("Login Successful!");
+  // Save user details
+  localStorage.setItem("user", JSON.stringify(data.user));
 
-      router.push("/dashboard");
-    } else {
-      alert(data.message);
-    }
+  alert("Login Successful!");
+
+  router.push("/dashboard");
+} else {
+  alert(data.message);
+}
+
   } catch (error) {
     console.error(error);
     alert("Server Error");

@@ -27,6 +27,8 @@ model User {
   password  String
   phone     String
   village   String?
+  address   String?
+  profileImage String?
   role      UserRole
   createdAt DateTime @default(now())
 
