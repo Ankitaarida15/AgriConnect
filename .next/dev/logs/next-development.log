@@ -1,5 +1,13 @@
-{"timestamp":"00:00:05.904","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:46.305","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:01:04.955","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:44:38.862","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:49:20.550","source":"Server","level":"LOG","message":"✓ Compiled in 113ms"}
+{"timestamp":"00:00:04.068","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:01:13.832","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:03:26.372","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Internal Server Error\"}"}
+{"timestamp":"00:03:32.865","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Too many login attempts. Try again after 15 minutes.\"}"}
+{"timestamp":"00:03:32.865","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Too many login attempts. Try again after 15 minutes.\"}"}
+{"timestamp":"00:03:32.865","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Internal Server Error\"}"}
+{"timestamp":"00:03:32.866","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Internal Server Error\"}"}
+{"timestamp":"00:03:32.866","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Internal Server Error\"}"}
+{"timestamp":"00:03:32.866","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Internal Server Error\"}"}
+{"timestamp":"00:03:47.497","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Too many login attempts. Try again after 15 minutes.\"}"}
+{"timestamp":"00:05:24.529","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Too many login attempts. Try again after 15 minutes.\"}"}
+{"timestamp":"00:06:58.210","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Too many login attempts. Try again after 15 minutes.\"}"}
+{"timestamp":"00:08:00.191","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}

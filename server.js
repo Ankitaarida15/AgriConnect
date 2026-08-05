@@ -633,13 +633,13 @@ if (req.file) {
       reply: response.text,
     });
 
-  } catch (error) {
-    console.error(error);
+ } catch (error) {
+  console.error("LOGIN ERROR:", error);
 
-    res.status(500).json({
-      message: "AI Error",
-    });
-  }
+  res.status(500).json({
+    message: error.message
+  });
+}
 });
 
 // =====================
