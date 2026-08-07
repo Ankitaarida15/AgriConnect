@@ -2,15 +2,20 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <nav className="flex justify-between items-center px-6 py-4 bg-green-100 shadow">
+    <nav className="flex items-center justify-between px-8 py-4 bg-white shadow">
 
+      {/* Logo */}
       <h1 className="text-xl font-bold text-green-700">
         AgriConnect
       </h1>
 
-      <div className="flex gap-6 text-green-800 font-medium">
+      {/* Navigation */}
+      <div className="flex items-center gap-6 text-green-800 font-medium">
+
         <Link href="/">Home</Link>
+
         <Link href="/about">About</Link>
+
         <Link href="/dashboard">Dashboard</Link>
 
         {/* AI Assistant */}
@@ -20,23 +25,43 @@ export default function Navbar() {
         >
           🤖 AI Assistant
         </Link>
-<div className="flex items-center gap-3">
-  <Link
-    href="/login"
-    className="hover:text-green-600 transition"
-  >
-    Login
-  </Link>
 
-  <Link
-    href="/register"
-    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-  >
-    Register
-  </Link>
-</div>
+        {/* Profile */}
+        <Link
+          href="/profile"
+          className="hover:text-green-600 transition"
+        >
+          👤 Profile
+        </Link>
+
+        {/* Login */}
+        <Link
+          href="/login"
+          className="hover:text-green-600 transition"
+        >
+          Login
+        </Link>
+
+        {/* Register */}
+        <Link
+          href="/register"
+          className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition"
+        >
+          Register
+        </Link>
+
+        <button
+  onClick={() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }}
+  className="text-red-600 hover:text-red-800 transition"
+>
+  Logout
+</button>
+
       </div>
-
     </nav>
   );
 }
