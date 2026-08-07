@@ -1,6 +1,25 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setLoggedIn(false);
+
+    window.location.href = "/login";
+  };
+
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-white shadow">
 
@@ -23,43 +42,46 @@ export default function Navbar() {
           href="/ai"
           className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition"
         >
-          🤖 AI Assistant
+          AI Assistant
         </Link>
 
-        {/* Profile */}
-        <Link
-          href="/profile"
-          className="hover:text-green-600 transition"
-        >
-          👤 Profile
-        </Link>
+        {loggedIn ? (
+          <>
+            {/* Profile */}
+            <Link
+              href="/profile"
+              className="hover:text-green-600 transition"
+            >
+              Profile
+            </Link>
 
-        {/* Login */}
-        <Link
-          href="/login"
-          className="hover:text-green-600 transition"
-        >
-          Login
-        </Link>
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="text-red-600 hover:text-red-800 transition"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Login */}
+            <Link
+              href="/login"
+              className="hover:text-green-600 transition"
+            >
+              Login
+            </Link>
 
-        {/* Register */}
-        <Link
-          href="/register"
-          className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition"
-        >
-          Register
-        </Link>
-
-        <button
-  onClick={() => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  }}
-  className="text-red-600 hover:text-red-800 transition"
->
-  Logout
-</button>
+            {/* Register */}
+            <Link
+              href="/register"
+              className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition"
+            >
+              Register
+            </Link>
+          </>
+        )}
 
       </div>
     </nav>
