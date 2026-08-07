@@ -34,6 +34,8 @@ const response = await fetch("https://agriconnect-x8no.onrender.com/login", {
 
     const data = await response.json();
 console.log("Login Response:", data);
+console.log("USER:", data.user);
+console.log("TOKEN:", !!data.token);
 
     if (response.ok) {
   localStorage.setItem("token", data.token);

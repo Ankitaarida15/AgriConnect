@@ -38,7 +38,10 @@ const ai = new GoogleGenAI({
 });
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://agri-connect-pp2d.vercel.app"
+  ],
   credentials: true,
 }));
 
@@ -172,7 +175,6 @@ const user = await prisma.user.create({
   }
 
 });
-
 // =====================
 // LOGIN USER
 // =====================
@@ -208,6 +210,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -219,11 +222,16 @@ app.post("/login", loginLimiter, async (req, res) => {
       }
     );
 
+
+    // password remove before sending response
+const { password, ...safeUser } = user;
+
     res.status(200).json({
       message: "Login Successful",
       token,
-      user
+      user: safeUser
     });
+
 
   } catch (error) {
 
@@ -237,6 +245,55 @@ app.post("/login", loginLimiter, async (req, res) => {
 
 });
 
+
+// =====================
+// GET CURRENT USER
+// =====================
+app.get("/me", authMiddleware, async (req, res) => {
+
+  try {
+
+    const user = await prisma.user.findUnique({
+
+      where: {
+        id: req.user.id,
+      },
+
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        village: true,
+        address: true,
+        role: true,
+        createdAt: true,
+      },
+
+    });
+
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+
+    res.status(200).json(user);
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+
+  }
+
+});
 // =====================
 // GET ALL PRODUCTS
 // =====================
@@ -671,8 +728,7 @@ app.get(
       }
     );
 
-    res.redirect(`https://agriconnect-xyz.vercel.app/login?token=${token}`);
-  }
+res.redirect(`https://agri-connect-pp2d.vercel.app/login?token=${token}`);  }
 );
 // =====================
 // START SERVER
