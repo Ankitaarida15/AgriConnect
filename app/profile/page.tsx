@@ -2,8 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+type User = {
+  id?: number;
+  name?: string;
+  email?: string;
+  phone?: string;
+  village?: string;
+  address?: string;
+  role?: string;
+};
+
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
 
   const [form, setForm] = useState({
@@ -14,10 +24,17 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    try {
+      const savedUser = localStorage.getItem("user");
 
-    if (savedUser) {
-      const data = JSON.parse(savedUser);
+      console.log("PROFILE USER:", savedUser);
+
+      if (!savedUser) {
+        setUser(null);
+        return;
+      }
+
+      const data: User = JSON.parse(savedUser);
 
       setUser(data);
 
@@ -27,6 +44,9 @@ export default function ProfilePage() {
         village: data.village || "",
         address: data.address || "",
       });
+    } catch (error) {
+      console.error("Profile loading error:", error);
+      setUser(null);
     }
   }, []);
 
@@ -38,6 +58,8 @@ export default function ProfilePage() {
   };
 
   const handleSave = () => {
+    if (!user) return;
+
     const updatedUser = {
       ...user,
       ...form,
@@ -54,9 +76,17 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading profile...</p>
-      </div>
+      <main className="min-h-screen bg-gray-100 p-8">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center">
+          <h1 className="text-2xl font-bold text-red-600">
+            User not found
+          </h1>
+
+          <p className="mt-3 text-gray-600">
+            Please login again to view your profile.
+          </p>
+        </div>
+      </main>
     );
   }
 
@@ -69,15 +99,15 @@ export default function ProfilePage() {
         <div className="text-center mb-8">
 
           <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold">
-            {user.name?.charAt(0).toUpperCase()}
+            {user.name?.charAt(0).toUpperCase() || "U"}
           </div>
 
           <h1 className="text-3xl font-bold mt-4">
-            {user.name}
+            {user.name || "User"}
           </h1>
 
           <p className="text-gray-500">
-            {user.role}
+            {user.role || "User"}
           </p>
 
         </div>
@@ -108,7 +138,7 @@ export default function ProfilePage() {
             <label className="font-semibold">Email</label>
 
             <p className="border rounded-lg p-3 mt-1 bg-gray-100">
-              {user.email}
+              {user.email || "Not provided"}
             </p>
           </div>
 
