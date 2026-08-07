@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type User = {
   id: number;
@@ -14,6 +15,8 @@ type User = {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
+
   const [user, setUser] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -25,13 +28,12 @@ export default function ProfilePage() {
     address: "",
   });
 
-  // =========================
-  // LOAD USER
-  // =========================
   useEffect(() => {
     const loadUser = async () => {
+      console.log("Profile page loaded");
+
       try {
-        // First check localStorage
+        // Check saved user
         const savedUser = localStorage.getItem("user");
 
         if (savedUser) {
@@ -50,16 +52,21 @@ export default function ProfilePage() {
           return;
         }
 
-        // If user is not in localStorage,
-        // get user using JWT token
+
+        // Check token
         const token = localStorage.getItem("token");
+
+        console.log("Token:", token);
+
 
         if (!token) {
           console.log("No token found");
-          setLoading(false);
+          router.push("/login");
           return;
         }
 
+
+        // Fetch profile from backend
         const response = await fetch(
           "https://agriconnect-x8no.onrender.com/me",
           {
@@ -69,17 +76,23 @@ export default function ProfilePage() {
           }
         );
 
-        if (!response.ok) {
-          console.log("User fetch failed");
-          setLoading(false);
-          return;
-        }
 
         const data = await response.json();
 
-        console.log("Profile User:", data);
+        console.log("Profile Response:", data);
+
+
+        if (!response.ok) {
+          console.log("Profile fetch failed");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/login");
+          return;
+        }
+
 
         setUser(data);
+
 
         setForm({
           name: data.name || "",
@@ -88,243 +101,329 @@ export default function ProfilePage() {
           address: data.address || "",
         });
 
-        // Save user for future use
-        localStorage.setItem("user", JSON.stringify(data));
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data)
+        );
+
 
         setLoading(false);
+
+
       } catch (error) {
-        console.error("Profile error:", error);
+
+        console.error(
+          "Profile error:",
+          error
+        );
+
         setLoading(false);
+        router.push("/login");
+
       }
     };
 
-    loadUser();
-  }, []);
 
-  // =========================
-  // HANDLE INPUT CHANGE
-  // =========================
+    loadUser();
+
+  }, [router]);
+
+
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
+
   };
 
-  // =========================
-  // SAVE PROFILE
-  // =========================
+
+
   const handleSave = () => {
+
     if (!user) return;
+
 
     const updatedUser = {
       ...user,
       ...form,
     };
 
+
     setUser(updatedUser);
+
 
     localStorage.setItem(
       "user",
       JSON.stringify(updatedUser)
     );
 
+
     setEditing(false);
 
-    alert("Profile updated successfully!");
+
+    alert(
+      "Profile updated successfully!"
+    );
+
   };
 
-  // =========================
-  // LOADING
-  // =========================
+
+
   if (loading) {
+
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-lg font-semibold">
+
+        <h1 className="text-xl font-semibold">
           Loading profile...
-        </p>
+        </h1>
+
       </main>
     );
+
   }
 
-  // =========================
-  // USER NOT FOUND
-  // =========================
+
+
   if (!user) {
+
     return (
+
       <main className="min-h-screen flex items-center justify-center">
+
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">
+
+          <h1 className="text-2xl font-bold">
             User not found
           </h1>
 
           <p className="mt-2 text-gray-600">
-            Please login again to view your profile.
+            Please login again.
           </p>
+
         </div>
+
       </main>
+
     );
+
   }
 
-  // =========================
-  // PROFILE PAGE
-  // =========================
+
+
   return (
-    <main className="min-h-screen bg-gray-100 py-10 px-4">
+
+    <main className="min-h-screen p-6">
+
 
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-        {/* PROFILE HEADER */}
+
         <div className="text-center mb-8">
 
+
           <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold">
+
             {user.name?.charAt(0).toUpperCase()}
+
           </div>
 
+
           <h1 className="text-3xl font-bold mt-4 text-gray-800">
+
             {user.name}
+
           </h1>
 
-          <p className="text-gray-500 mt-1">
+
+          <p className="text-gray-500">
+
             {user.role || "User"}
+
           </p>
+
 
         </div>
 
-        {/* PROFILE DETAILS */}
+
+
         <div className="space-y-5">
 
-          {/* NAME */}
+
           <div>
+
             <label className="font-semibold text-gray-700">
               Name
             </label>
 
+
             {editing ? (
+
               <input
                 name="name"
                 value={form.name}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 mt-1 text-black"
               />
+
             ) : (
+
               <p className="border rounded-lg p-3 mt-1 text-gray-700">
-                {user.name || "Not provided"}
+                {user.name}
               </p>
+
             )}
+
           </div>
 
-          {/* EMAIL */}
+
+
           <div>
+
             <label className="font-semibold text-gray-700">
               Email
             </label>
 
-            <p className="border rounded-lg p-3 mt-1 bg-gray-100 text-gray-700">
+
+            <p className="border rounded-lg p-3 mt-1 text-gray-700 bg-gray-100">
+
               {user.email}
+
             </p>
+
           </div>
 
-          {/* PHONE */}
+
+
           <div>
+
             <label className="font-semibold text-gray-700">
               Phone
             </label>
 
+
             {editing ? (
+
               <input
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 mt-1 text-black"
-                placeholder="Enter phone number"
               />
+
             ) : (
+
               <p className="border rounded-lg p-3 mt-1 text-gray-700">
+
                 {user.phone || "Not provided"}
+
               </p>
+
             )}
+
           </div>
 
-          {/* VILLAGE */}
+
+
           <div>
+
             <label className="font-semibold text-gray-700">
               Village
             </label>
 
+
             {editing ? (
+
               <input
                 name="village"
                 value={form.village}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 mt-1 text-black"
-                placeholder="Enter village"
               />
+
             ) : (
+
               <p className="border rounded-lg p-3 mt-1 text-gray-700">
+
                 {user.village || "Not provided"}
+
               </p>
+
             )}
+
           </div>
 
-          {/* ADDRESS */}
+
+
           <div>
+
             <label className="font-semibold text-gray-700">
               Address
             </label>
 
+
             {editing ? (
+
               <input
                 name="address"
                 value={form.address}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 mt-1 text-black"
-                placeholder="Enter address"
               />
+
             ) : (
+
               <p className="border rounded-lg p-3 mt-1 text-gray-700">
+
                 {user.address || "Not provided"}
+
               </p>
+
             )}
+
           </div>
 
-          {/* BUTTONS */}
-          <div className="pt-4">
+
+
+          <div>
 
             {!editing ? (
+
               <button
                 onClick={() => setEditing(true)}
-                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
+                className="w-full bg-green-600 text-white py-3 rounded-lg"
               >
                 Edit Profile
               </button>
+
             ) : (
-              <div className="flex gap-3">
 
-                <button
-                  onClick={handleSave}
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
-                >
-                  Save Changes
-                </button>
+              <button
+                onClick={handleSave}
+                className="w-full bg-green-600 text-white py-3 rounded-lg"
+              >
+                Save Changes
+              </button>
 
-                <button
-                  onClick={() => setEditing(false)}
-                  className="flex-1 bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-
-              </div>
             )}
 
           </div>
 
+
         </div>
+
+
       </div>
 
+
     </main>
+
   );
+
 }
