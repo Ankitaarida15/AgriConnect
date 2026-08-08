@@ -36,17 +36,18 @@ const response = await fetch("https://agriconnect-x8no.onrender.com/login", {
 console.log("Login Response:", data);
 console.log("USER:", data.user);
 console.log("TOKEN:", !!data.token);
-
-    if (response.ok) {
+if (response.ok) {
   localStorage.setItem("token", data.token);
 
-  // Save user details
-  localStorage.setItem("user", JSON.stringify(data.user));
+  if (data.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
 
   alert("Login Successful!");
 
   router.push("/dashboard");
-} else {
+}
+else {
   alert(data.message);
 }
 
