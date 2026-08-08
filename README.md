@@ -1,266 +1,201 @@
+# AgriConnect 🌾
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**AI-Powered Smart Agriculture Platform**
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://
-) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# AgriConnect
-
-AI-powered Smart Agriculture Platform connecting farmers and buyers with digital solutions, smart recommendations, and market insights.
+AgriConnect is a full-stack smart agriculture platform designed to connect farmers and buyers through digital product management, secure authentication, product search, order management, and AI-powered agricultural assistance.
 
 ---
 
-# Project Overview
+## 📌 Project Overview
 
-AgriConnect is a full-stack agriculture platform that helps farmers sell their products directly to buyers. The platform provides product management, secure authentication, order management, and AI-powered assistance using Google Gemini API.
+AgriConnect helps farmers list and manage agricultural products while allowing buyers to discover products and place orders.
+
+The platform combines a modern **Next.js frontend**, **Node.js/Express backend**, **PostgreSQL database**, **Prisma ORM**, and **Google Gemini AI** to provide a complete digital agriculture solution.
+
+### Main Objectives
+
+* Connect farmers and buyers digitally
+* Provide secure user authentication
+* Allow farmers to manage agricultural products
+* Allow buyers to search and explore products
+* Provide AI-powered agricultural assistance
+* Store application data securely in a PostgreSQL database
+* Deploy the application for real-world access
 
 ---
 
 # Week 1 — Project Setup & Planning
 
 ## Work Completed
-- Project idea finalized: Smart Agriculture Platform
-- AgriConnect project structure created
-- Frontend and backend environment setup
-- Technology stack selected
-- Basic project planning completed
 
-## Technologies Used
-- Next.js
-- Node.js
-- Express.js
-- PostgreSQL
-- Prisma ORM
+* Finalized project idea: Smart Agriculture Platform
+* Selected project name: AgriConnect
+* Created initial project structure
+* Planned frontend and backend architecture
+* Selected the technology stack
+* Set up the development environment
+
+## Technologies Selected
+
+* Next.js
+* TypeScript
+* Node.js
+* Express.js
+* PostgreSQL
+* Prisma ORM
 
 ---
 
 # Week 2 — Frontend Development & UI Design
 
 ## Work Completed
-- Created responsive frontend interface
-- Designed homepage and navigation system
-- Added reusable components
-- Implemented Tailwind CSS styling
-- Created pages for:
-  - Home
-  - Login
-  - Register
-  - Dashboard
 
-## Features Added
-- Responsive UI design
-- Navbar and Footer components
-- User-friendly layouts
+* Created responsive frontend interface
+* Designed homepage
+* Created navigation system
+* Added reusable components
+* Implemented Tailwind CSS
+* Created basic application pages
+
+## Pages Created
+
+* Home
+* About
+* Login
+* Register
+* Dashboard
+* AI Assistant
+* Profile
+
+## UI Features
+
+* Responsive design
+* Navigation bar
+* Footer
+* Reusable UI components
+* User-friendly layouts
+* Theme support
 
 ---
 
 # Week 3 — Backend Development & API Creation
 
 ## Work Completed
-- Created Express.js backend server
-- Connected backend with database
-- Created REST API endpoints
+
+* Created Node.js and Express.js backend
+* Configured backend server
+* Connected backend with database
+* Created REST API endpoints
+* Added middleware for authentication and authorization
 
 ## API Features
-- User APIs
-- Product APIs
-- Search API
-- Order API
-- AI Assistant API
 
-## Database
-- Prisma ORM integration
-- PostgreSQL database setup
+* User registration
+* User login
+* Product management
+* Product search
+* Order management
+* AI assistant endpoint
+
+## Backend Technologies
+
+* Node.js
+* Express.js
+* Prisma ORM
+* PostgreSQL
+* JWT
+* bcrypt
 
 ---
 
 # Week 4 — Database Integration & CRUD Operations
 
 ## Work Completed
-- Designed database schema
-- Connected application with Supabase PostgreSQL
-- Implemented CRUD operations
 
-## CRUD Features
-- Create products
-- Read products
-- Update products
-- Delete products
+* Designed database structure
+* Integrated PostgreSQL database
+* Connected Prisma ORM
+* Implemented CRUD operations
+* Created database models
 
-## Database Models
-- User
-- Product
-- Order
+## CRUD Operations
+
+### Create
+
+Farmers can add agricultural products.
+
+### Read
+
+Users can view available products.
+
+### Update
+
+Product information can be updated.
+
+### Delete
+
+Products can be removed when required.
+
+## Main Database Models
+
+* User
+* Product
+* Order
 
 ---
 
-# Week 5 — Database Integration & Testing
+# Week 5 — Database Testing & API Testing
 
 ## Work Completed
-- Integrated all APIs with real database
-- Tested API endpoints using Postman
-- Added Prisma schema
-- Created database schema diagram
-- Verified CRUD operations
 
-## Completed APIs
-- User registration
-- User login
-- Product management
-- Product search
-- Order placement
-- AI assistant
+* Connected APIs with the real database
+* Tested backend APIs using Postman
+* Verified CRUD operations
+* Tested product search
+* Tested authentication APIs
+* Checked database responses
+* Added and verified Prisma schema
+
+## APIs Tested
+
+* User Registration
+* User Login
+* Product Creation
+* Product Listing
+* Product Update
+* Product Deletion
+* Product Search
+* Order Operations
+* AI Assistant
 
 ---
 
 # Week 6 — Authentication & Security
 
 ## Work Completed
-- Implemented secure user authentication
-- Added password hashing
-- Added JWT authentication
-- Added Google OAuth login
-- Protected API routes
-- Added security practices
+
+* Implemented secure user authentication
+* Added password hashing
+* Implemented JWT authentication
+* Added Google OAuth authentication
+* Protected API routes
+* Added role-based access
+* Added security middleware
 
 ## Security Features
-- bcrypt password encryption
-- JWT token generation
-- Protected frontend routes
-- Input validation using express-validator
-- Rate limiting for login security
-- Secure CORS configuration
 
----
+* bcrypt password hashing
+* JWT token authentication
+* Protected routes
+* Input validation
+* Rate limiting
+* CORS configuration
+* Environment variables for sensitive information
 
-# Features
+## Authentication Methods
 
-- User Registration and Login
-- Google OAuth Authentication
-- Farmer and Buyer roles
-- Product listing and management
-- Product search
-- Order placement system
-- AI Assistant using Gemini API
-- Secure authentication system
-- Database integration
-
----
-
-# Database Used
-
-Supabase (PostgreSQL)
-
-## Why Supabase?
-
-Supabase provides a free PostgreSQL database with cloud storage and easy integration with full-stack applications.
-
----
-
-# Database Schema
-
-(Insert your schema diagram image here)
-
----
-
-# Tech Stack
-
-## Frontend
-- Next.js
-- TypeScript
-- Tailwind CSS
-
-## Backend
-- Node.js
-- Express.js
-- Prisma ORM
-- PostgreSQL
-
-## Authentication
-- JWT
-- bcrypt
-- Passport.js
-- Google OAuth
-
-## AI
-- Google Gemini API
-
----
-
-# Installation & Setup
-
-1. Clone the repository.
-
-2. Install dependencies:
-
-3. Create a `.env` file.
-
-4. Add required variables:
-  
-5. Start backend server:
-
-6. Run frontend:
-
-AgriConnect
-│
-├── app
-│ ├── login
-│ ├── register
-│ └── dashboard
-│
-├── backend
-│ ├── server.js
-│ ├── prisma
-│ ├── routes
-│ ├── controllers
-│ └── passportConfig.js
-│
-└── components
-
----
-
-# Future Improvements
-
-- Online payment integration
-- Weather prediction
-- Crop disease detection
-- Real-time market prices
-- Mobile application
-
->>>>>>> 7c705c496a9d60b78cec0a10c84b8d42be517d27
+* Email and password
+* Google OAuth
 
 ---
 
@@ -268,13 +203,427 @@ AgriConnect
 
 ## Work Completed
 
-- Integrated Google Gemini API
-- Created AI Chat page
-- Connected frontend with backend AI endpoint
-- Added loading state while AI generates response
-- Added error handling
-- Stored API key securely using .env
+* Integrated Google Gemini API
+* Created AI Assistant page
+* Connected frontend with backend AI endpoint
+* Added loading state
+* Added error handling
+* Secured Gemini API key using environment variables
 
 ## AI Feature
 
-Users can ask agriculture-related questions and receive AI-powered responses using Google Gemini.
+Users can ask agriculture-related questions and receive AI-powered responses.
+
+The AI assistant can help users with agriculture-related information and general farming questions.
+
+---
+
+# Week 8 — Frontend Integration & Polish
+
+## Work Completed
+
+* Connected frontend with backend APIs
+* Integrated product data from the database
+* Improved Dashboard page
+* Added product search functionality
+* Integrated authentication with frontend
+* Improved Login and Register flow
+* Added Profile page
+* Connected AI Assistant with backend
+* Improved responsive design
+* Fixed frontend and backend integration issues
+* Improved overall UI consistency
+
+## Frontend Features Completed
+
+* User registration
+* User login
+* User profile
+* Product listing
+* Product search
+* Product management
+* AI Assistant
+* Dashboard
+* Responsive navigation
+
+## UI Improvements
+
+* Improved page layouts
+* Improved navigation
+* Improved loading states
+* Improved error handling
+* Improved mobile responsiveness
+* Improved overall user experience
+
+---
+
+# Week 9 — Testing, Deployment & Bug Fixing
+
+## Work Completed
+
+* Tested frontend functionality
+* Tested backend APIs
+* Tested authentication
+* Tested database operations
+* Tested AI Assistant
+* Fixed deployment-related issues
+* Configured environment variables
+* Configured production database
+* Deployed backend
+* Prepared frontend for production deployment
+
+## Testing Performed
+
+### Authentication Testing
+
+* Registration tested
+* Login tested
+* JWT authentication tested
+* Google OAuth tested
+* Protected routes tested
+
+### Product Testing
+
+* Add product tested
+* View products tested
+* Update product tested
+* Delete product tested
+* Search functionality tested
+
+### AI Testing
+
+* AI request tested
+* AI response tested
+* Loading state tested
+* Error handling tested
+
+### Database Testing
+
+* PostgreSQL connection verified
+* Prisma connection verified
+* CRUD operations verified
+
+---
+
+# Week 10 — Capstone & Portfolio
+
+## Final Project Work
+
+Week 10 focused on completing, polishing, documenting, and preparing AgriConnect as a final portfolio project.
+
+## Work Completed
+
+* Completed major frontend features
+* Completed backend integration
+* Completed authentication system
+* Completed database integration
+* Completed AI Assistant
+* Fixed major bugs
+* Improved UI
+* Added project screenshots
+* Updated project documentation
+* Prepared final README
+* Prepared project for submission
+* Deployed the application
+
+## Final Deliverables
+
+* Full-stack AgriConnect application
+* Frontend
+* Backend
+* PostgreSQL database
+* Authentication system
+* Product management system
+* Search functionality
+* AI Assistant
+* Deployment
+* GitHub repository
+* Project documentation
+* Screenshots
+
+---
+
+# 🚀 Features
+
+* User Registration and Login
+* Google OAuth Authentication
+* Farmer and Buyer roles
+* User Profile
+* Product Listing
+* Add Product
+* Update Product
+* Delete Product
+* Product Search
+* Order Management
+* AI Agriculture Assistant
+* Secure Authentication
+* PostgreSQL Database
+* Responsive UI
+* REST APIs
+* Production Deployment
+
+---
+
+# 🗄️ Database
+
+AgriConnect uses **Supabase PostgreSQL** as its cloud database.
+
+## Database Models
+
+* User
+* Product
+* Order
+
+## Why PostgreSQL?
+
+PostgreSQL provides reliable relational data storage and works well with Prisma ORM for full-stack applications.
+
+---
+
+# 🧩 Database Schema
+
+The database contains relationships between users, products, and orders.
+
+A database schema diagram can be added here:
+
+```text
+User
+ │
+ ├── Products
+ │
+ └── Orders
+       │
+       └── Products
+```
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+
+## Backend
+
+* Node.js
+* Express.js
+* Prisma ORM
+
+## Database
+
+* PostgreSQL
+* Supabase
+
+## Authentication
+
+* JWT
+* bcrypt
+* Passport.js
+* Google OAuth
+
+## AI
+
+* Google Gemini API
+
+## Testing
+
+* Postman
+
+## Deployment
+
+* Render
+* Vercel
+
+---
+
+# 📁 Project Structure
+
+```text
+AgriConnect
+│
+├── app
+│   ├── login
+│   ├── register
+│   ├── dashboard
+│   ├── profile
+│   └── ai
+│
+├── backend
+│   ├── server.js
+│   ├── routes
+│   ├── controllers
+│   ├── prisma
+│   └── passportConfig.js
+│
+├── components
+│
+├── public
+│
+├── prisma
+│
+├── screenshots
+│   ├── home.png
+│   ├── dashboard.png
+│   ├── ai.png
+│   └── profile.png
+│
+├── package.json
+├── README.md
+└── .env.local
+```
+
+---
+
+# ⚙️ Installation & Setup
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/Ankitaarida15/AgriConnect.git
+```
+
+## 2. Open the Project
+
+```bash
+cd AgriConnect
+```
+
+## 3. Install Dependencies
+
+```bash
+npm install
+```
+
+## 4. Configure Environment Variables
+
+Create the required environment files and add the required configuration such as:
+
+```text
+DATABASE_URL
+JWT_SECRET
+GEMINI_API_KEY
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+```
+
+Do not upload secret keys or passwords to GitHub.
+
+## 5. Start the Frontend
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## 6. Start the Backend
+
+Open the backend directory and start the Express server using the configured backend start command.
+
+The backend runs on the configured server port.
+
+---
+
+# 📸 Screenshots
+
+## Home Page
+
+![AgriConnect Home](screenshots/home.png)
+
+## Dashboard
+
+![AgriConnect Dashboard](screenshots/dashboard.png)
+
+## AI Assistant
+
+![AgriConnect AI Assistant](screenshots/ai.png)
+
+## Profile
+
+![AgriConnect Profile](screenshots/profile.png)
+
+---
+
+# 🌐 Deployment
+
+The AgriConnect backend has been configured for production deployment using Render.
+
+The frontend is prepared for production deployment using Vercel.
+
+Environment variables are configured separately for the production environment.
+
+---
+
+# 🔗 GitHub Repository
+
+**AgriConnect GitHub Repository**
+
+https://github.com/Ankitaarida15/AgriConnect
+
+---
+
+# 📊 Project Status
+
+| Module               | Status      |
+| -------------------- | ----------- |
+| Project Setup        | ✅ Completed |
+| Frontend UI          | ✅ Completed |
+| Backend API          | ✅ Completed |
+| Database             | ✅ Completed |
+| CRUD Operations      | ✅ Completed |
+| Authentication       | ✅ Completed |
+| Google OAuth         | ✅ Completed |
+| Product Search       | ✅ Completed |
+| AI Assistant         | ✅ Completed |
+| Frontend Integration | ✅ Completed |
+| Testing              | ✅ Completed |
+| Deployment           | ✅ Completed |
+| Documentation        | ✅ Completed |
+| Screenshots          | ✅ Completed |
+
+---
+
+# 🔮 Future Improvements
+
+* Online payment integration
+* Real-time market prices
+* Weather prediction
+* Crop disease detection
+* Advanced AI crop recommendations
+* Real-time notifications
+* Mobile application
+* Multilingual support
+* Advanced farmer analytics
+
+---
+
+# 🎯 Conclusion
+
+AgriConnect successfully demonstrates how modern web technologies and artificial intelligence can be combined to build a practical smart agriculture platform.
+
+The project provides farmers and buyers with a digital platform for product management, secure authentication, product discovery, and AI-powered agricultural assistance.
+
+The final application combines:
+
+**Next.js + Express.js + PostgreSQL + Prisma + Google Gemini AI**
+
+to create a scalable and user-friendly agriculture solution.
+
+---
+
+# 👩‍💻 Project
+
+**Project Name:** AgriConnect
+**Type:** Full-Stack AI-Powered Agriculture Platform
+**Frontend:** Next.js
+**Backend:** Node.js + Express.js
+**Database:** PostgreSQL / Supabase
+**ORM:** Prisma
+**AI:** Google Gemini API
