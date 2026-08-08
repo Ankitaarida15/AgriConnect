@@ -126,22 +126,15 @@ export default function ProfilePage() {
   // LOADING
   // =========================
 
-  if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-700">
-            Loading profile...
-          </div>
-
-          <p className="mt-2 text-gray-500">
-            Please wait...
-          </p>
-        </div>
-      </main>
-    );
-  }
-
+ if (loading) {
+  return (
+    <main className="min-h-screen flex items-center justify-center">
+      <h1 className="text-3xl font-bold text-red-600">
+        PROFILE TEST 123
+      </h1>
+    </main>
+  );
+}
   // =========================
   // USER NOT FOUND
   // =========================
