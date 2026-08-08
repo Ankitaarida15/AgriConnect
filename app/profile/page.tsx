@@ -15,8 +15,8 @@ type User = {
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     name: "",
@@ -26,22 +26,51 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const loadProfile = async () => {
-      console.log("PROFILE: Loading started");
+    let mounted = true;
 
+    const loadUser = async () => {
       try {
-        // Get JWT token
+        console.log("PROFILE: loading started");
+
+        // 1. Check localStorage
+        const savedUser = localStorage.getItem("user");
+
+        if (savedUser) {
+          console.log("PROFILE: user found in localStorage");
+
+          const data = JSON.parse(savedUser);
+
+          if (!mounted) return;
+
+          setUser(data);
+
+          setForm({
+            name: data.name || "",
+            phone: data.phone || "",
+            village: data.village || "",
+            address: data.address || "",
+          });
+
+          setLoading(false);
+          return;
+        }
+
+        // 2. Get token
         const token = localStorage.getItem("token");
 
         console.log("PROFILE TOKEN:", !!token);
 
         if (!token) {
-          console.log("PROFILE: No token found");
-          setLoading(false);
+          console.log("PROFILE: no token");
+
+          if (mounted) {
+            setLoading(false);
+          }
+
           return;
         }
 
-        // Get user from backend
+        // 3. Get user from backend
         const response = await fetch(
           "https://agriconnect-x8no.onrender.com/me",
           {
@@ -53,24 +82,28 @@ export default function ProfilePage() {
           }
         );
 
-        console.log("PROFILE STATUS:", response.status);
+        console.log("PROFILE RESPONSE STATUS:", response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
+
           console.error("PROFILE API ERROR:", errorText);
 
-          setLoading(false);
+          if (mounted) {
+            setLoading(false);
+          }
+
           return;
         }
 
-        const data: User = await response.json();
+        const data = await response.json();
 
         console.log("PROFILE USER:", data);
 
-        // Set user
+        if (!mounted) return;
+
         setUser(data);
 
-        // Set form
         setForm({
           name: data.name || "",
           phone: data.phone || "",
@@ -78,19 +111,23 @@ export default function ProfilePage() {
           address: data.address || "",
         });
 
-        // Save fresh user data
         localStorage.setItem("user", JSON.stringify(data));
 
+        setLoading(false);
       } catch (error) {
         console.error("PROFILE ERROR:", error);
-      } finally {
-        // VERY IMPORTANT
-        // Loading will always stop
-        setLoading(false);
+
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadProfile();
+    loadUser();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleChange = (
@@ -105,7 +142,7 @@ export default function ProfilePage() {
   const handleSave = () => {
     if (!user) return;
 
-    const updatedUser = {
+    const updatedUser: User = {
       ...user,
       ...form,
     };
@@ -122,27 +159,22 @@ export default function ProfilePage() {
     alert("Profile updated successfully!");
   };
 
-  // =========================
-  // LOADING
-  // =========================
+  // Loading
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl text-gray-700">
+          Loading profile...
+        </div>
+      </main>
+    );
+  }
 
- if (loading) {
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-red-600">
-        PROFILE TEST 123
-      </h1>
-    </main>
-  );
-}
-  // =========================
-  // USER NOT FOUND
-  // =========================
-
+  // User not found
   if (!user) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-2xl shadow">
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800">
             User not found
           </h1>
@@ -155,17 +187,12 @@ export default function ProfilePage() {
     );
   }
 
-  // =========================
-  // PROFILE
-  // =========================
-
   return (
-    <main className="min-h-screen p-6">
+    <main className="min-h-screen bg-gray-100 p-6">
 
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-        {/* PROFILE HEADER */}
-
+        {/* HEADER */}
         <div className="text-center mb-8">
 
           <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold">
@@ -183,11 +210,9 @@ export default function ProfilePage() {
         </div>
 
         {/* DETAILS */}
-
         <div className="space-y-5">
 
           {/* NAME */}
-
           <div>
             <label className="font-semibold text-gray-700">
               Name
@@ -208,19 +233,17 @@ export default function ProfilePage() {
           </div>
 
           {/* EMAIL */}
-
           <div>
             <label className="font-semibold text-gray-700">
               Email
             </label>
 
             <p className="border rounded-lg p-3 mt-1 bg-gray-100 text-gray-700">
-              {user.email || "Not provided"}
+              {user.email}
             </p>
           </div>
 
           {/* PHONE */}
-
           <div>
             <label className="font-semibold text-gray-700">
               Phone
@@ -242,7 +265,6 @@ export default function ProfilePage() {
           </div>
 
           {/* VILLAGE */}
-
           <div>
             <label className="font-semibold text-gray-700">
               Village
@@ -264,7 +286,6 @@ export default function ProfilePage() {
           </div>
 
           {/* ADDRESS */}
-
           <div>
             <label className="font-semibold text-gray-700">
               Address
@@ -285,8 +306,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* BUTTONS */}
-
+          {/* BUTTON */}
           <div className="pt-4">
 
             {!editing ? (
@@ -319,7 +339,6 @@ export default function ProfilePage() {
           </div>
 
         </div>
-
       </div>
 
     </main>
