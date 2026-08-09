@@ -26,109 +26,58 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    let mounted = true;
+  const loadUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const loadUser = async () => {
-      try {
-        console.log("PROFILE: loading started");
-
-        // 1. Check localStorage
-        const savedUser = localStorage.getItem("user");
-
-        if (savedUser) {
-          console.log("PROFILE: user found in localStorage");
-
-          const data = JSON.parse(savedUser);
-
-          if (!mounted) return;
-
-          setUser(data);
-
-          setForm({
-            name: data.name || "",
-            phone: data.phone || "",
-            village: data.village || "",
-            address: data.address || "",
-          });
-
-          setLoading(false);
-          return;
-        }
-
-        // 2. Get token
-        const token = localStorage.getItem("token");
-
-        console.log("PROFILE TOKEN:", !!token);
-
-        if (!token) {
-          console.log("PROFILE: no token");
-
-          if (mounted) {
-            setLoading(false);
-          }
-
-          return;
-        }
-
-        // 3. Get user from backend
-        const response = await fetch(
-          "https://agriconnect-x8no.onrender.com/me",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("PROFILE RESPONSE STATUS:", response.status);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-
-          console.error("PROFILE API ERROR:", errorText);
-
-          if (mounted) {
-            setLoading(false);
-          }
-
-          return;
-        }
-
-        const data = await response.json();
-
-        console.log("PROFILE USER:", data);
-
-        if (!mounted) return;
-
-        setUser(data);
-
-        setForm({
-          name: data.name || "",
-          phone: data.phone || "",
-          village: data.village || "",
-          address: data.address || "",
-        });
-
-        localStorage.setItem("user", JSON.stringify(data));
-
+      if (!token) {
         setLoading(false);
-      } catch (error) {
-        console.error("PROFILE ERROR:", error);
-
-        if (mounted) {
-          setLoading(false);
-        }
+        return;
+  
       }
-    };
 
-    loadUser();
+      const response = await fetch(
+        "https://agriconnect-x8no.onrender.com/me",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+      if (!response.ok) {
+        console.error("Profile API failed:", response.status);
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
+      console.log("LATEST PROFILE:", data);
+
+      setUser(data);
+
+      setForm({
+        name: data.name || "",
+        phone: data.phone || "",
+        village: data.village || "",
+        address: data.address || "",
+      });
+
+      localStorage.setItem("user", JSON.stringify(data));
+
+      setLoading(false);
+
+    } catch (error) {
+      console.error("Profile error:", error);
+      setLoading(false);
+    }
+  };
+
+  loadUser();
+}, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -139,42 +88,72 @@ export default function ProfilePage() {
     });
   };
 
-  const handleSave = () => {
-    if (!user) return;
+ const handleSave = async () => {
+  if (!user) return;
 
-    const updatedUser: User = {
-      ...user,
-      ...form,
-    };
+  try {
+    const token = localStorage.getItem("token");
 
-    setUser(updatedUser);
+    if (!token) {
+      alert("Please login again.");
+      return;
+    }
+
+    const response = await fetch(
+      "https://agriconnect-x8no.onrender.com/me",
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          village: form.village,
+          address: form.address,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Failed to update profile");
+      return;
+    }
+
+    setUser(data.user);
 
     localStorage.setItem(
       "user",
-      JSON.stringify(updatedUser)
+      JSON.stringify(data.user)
     );
 
     setEditing(false);
 
     alert("Profile updated successfully!");
-  };
 
-  // Loading
+  } catch (error) {
+    console.error("PROFILE UPDATE ERROR:", error);
+    alert("Something went wrong while updating profile.");
+  }
+};
+
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-700">
+      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg text-gray-600">
           Loading profile...
-        </div>
+        </p>
       </main>
     );
   }
 
-  // User not found
   if (!user) {
     return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white shadow-lg rounded-2xl p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800">
             User not found
           </h1>
@@ -188,22 +167,21 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-6">
-
+    <main className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
         {/* HEADER */}
         <div className="text-center mb-8">
 
           <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold">
-            {user.name?.charAt(0).toUpperCase()}
+            {user.name?.charAt(0).toUpperCase() || "U"}
           </div>
 
           <h1 className="text-3xl font-bold mt-4 text-gray-800">
-            {user.name}
+            {user.name || "User"}
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 mt-1 uppercase">
             {user.role || "User"}
           </p>
 
@@ -239,7 +217,7 @@ export default function ProfilePage() {
             </label>
 
             <p className="border rounded-lg p-3 mt-1 bg-gray-100 text-gray-700">
-              {user.email}
+              {user.email || "Not provided"}
             </p>
           </div>
 
@@ -340,7 +318,6 @@ export default function ProfilePage() {
 
         </div>
       </div>
-
     </main>
   );
 }

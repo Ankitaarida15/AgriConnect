@@ -245,7 +245,6 @@ const { password, ...safeUser } = user;
 
 });
 
-
 // =====================
 // GET CURRENT USER
 // =====================
@@ -254,7 +253,6 @@ app.get("/me", authMiddleware, async (req, res) => {
   try {
 
     const user = await prisma.user.findUnique({
-
       where: {
         id: req.user.id,
       },
@@ -269,9 +267,7 @@ app.get("/me", authMiddleware, async (req, res) => {
         role: true,
         createdAt: true,
       },
-
     });
-
 
     if (!user) {
       return res.status(404).json({
@@ -279,9 +275,7 @@ app.get("/me", authMiddleware, async (req, res) => {
       });
     }
 
-
     res.status(200).json(user);
-
 
   } catch (error) {
 
@@ -294,6 +288,65 @@ app.get("/me", authMiddleware, async (req, res) => {
   }
 
 });
+
+
+// =====================
+// UPDATE CURRENT USER PROFILE
+// =====================
+app.put("/me", authMiddleware, async (req, res) => {
+
+  try {
+
+    const {
+      name,
+      phone,
+      village,
+      address
+    } = req.body;
+
+    const updatedUser = await prisma.user.update({
+
+      where: {
+        id: req.user.id
+      },
+
+      data: {
+        name,
+        phone,
+        village,
+        address
+      },
+
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        village: true,
+        address: true,
+        role: true,
+        createdAt: true
+      }
+
+    });
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+
+  } catch (error) {
+
+    console.error("UPDATE PROFILE ERROR:", error);
+
+    res.status(500).json({
+      message: "Failed to update profile"
+    });
+
+  }
+
+});
+
 // =====================
 // GET ALL PRODUCTS
 // =====================
