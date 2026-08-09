@@ -25,15 +25,17 @@ export default function ProfilePage() {
     address: "",
   });
 
-  useEffect(() => {
+ useEffect(() => {
   const loadUser = async () => {
     try {
       const token = localStorage.getItem("token");
 
+      console.log("PROFILE TOKEN:", token);
+
       if (!token) {
+        console.log("❌ NO TOKEN FOUND");
         setLoading(false);
         return;
-  
       }
 
       const response = await fetch(
@@ -47,15 +49,17 @@ export default function ProfilePage() {
         }
       );
 
-      if (!response.ok) {
-        console.error("Profile API failed:", response.status);
-        setLoading(false);
-        return;
-      }
+      console.log("ME API STATUS:", response.status);
 
       const data = await response.json();
 
-      console.log("LATEST PROFILE:", data);
+      console.log("ME API RESPONSE:", data);
+
+      if (!response.ok) {
+        console.error("❌ PROFILE API ERROR:", data);
+        setLoading(false);
+        return;
+      }
 
       setUser(data);
 
@@ -71,17 +75,21 @@ export default function ProfilePage() {
       setLoading(false);
 
     } catch (error) {
-      console.error("Profile error:", error);
+      console.error("❌ PROFILE ERROR:", error);
       setLoading(false);
     }
   };
 
   loadUser();
 }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  setForm({
+    ...form,
+    [e.target.name]: e.target.value,
+  });
+};
     setForm({
       ...form,
       [e.target.name]: e.target.value,
