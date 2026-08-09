@@ -6,17 +6,57 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const router = useRouter();
 
-  useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
+ useEffect(() => {
+  const handleGoogleLogin = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
 
-  if (token) {
-    localStorage.setItem("token", token);
-    alert("Google Login Successful!");
-    router.push("/dashboard");
-  }
+    if (!token) return;
+
+    try {
+      // Save Google JWT
+      localStorage.setItem("token", token);
+
+      // Get logged-in user from backend
+      const response = await fetch(
+        "https://agriconnect-x8no.onrender.com/me",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Google user fetch failed:", response.status);
+        alert("Google Login failed");
+        return;
+      }
+
+      const user = await response.json();
+
+      console.log("GOOGLE USER:", user);
+
+      // Save user
+      localStorage.setItem("user", JSON.stringify(user));
+
+      alert("Google Login Successful!");
+
+      // Remove token from URL
+      window.history.replaceState({}, document.title, "/login");
+
+      router.push("/dashboard");
+
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      alert("Something went wrong with Google Login");
+    }
+  };
+
+  handleGoogleLogin();
 }, [router]);
-
 const [form, setForm] = useState({
   email: "",
   password: "",
