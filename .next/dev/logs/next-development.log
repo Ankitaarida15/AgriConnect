@@ -1,15 +1,5 @@
-{"timestamp":"00:00:01.625","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:12.358","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:00:16.482","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:00:21.538","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:00:21.618","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:00:23.957","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:01:10.978","source":"Server","level":"LOG","message":"✓ Compiled in 79ms"}
-{"timestamp":"00:02:49.077","source":"Server","level":"LOG","message":"✓ Compiled in 124ms"}
-{"timestamp":"00:02:58.318","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:03:08.931","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Email and Password are required\"}"}
-{"timestamp":"00:03:08.931","source":"Browser","level":"LOG","message":"USER: undefined"}
-{"timestamp":"00:03:08.931","source":"Browser","level":"LOG","message":"TOKEN: false"}
-{"timestamp":"00:03:19.490","source":"Browser","level":"LOG","message":"Login Response: {\"message\":\"Invalid Email\"}"}
-{"timestamp":"00:03:19.490","source":"Browser","level":"LOG","message":"USER: undefined"}
-{"timestamp":"00:03:19.490","source":"Browser","level":"LOG","message":"TOKEN: false"}
+{"timestamp":"00:00:15.240","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:33.726","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:33.847","source":"Browser","level":"LOG","message":"PROFILE TOKEN: null"}
+{"timestamp":"00:00:33.848","source":"Browser","level":"LOG","message":"❌ NO TOKEN FOUND"}
+{"timestamp":"00:00:35.839","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}

@@ -55,10 +55,12 @@
     --color-gray-500: #6a7282;
     --color-gray-600: #4a5565;
     --color-gray-700: #364153;
+    --color-gray-800: #1e2939;
     --color-gray-900: #101828;
     --color-black: #000;
     --color-white: #fff;
     --spacing: .25rem;
+    --container-md: 28rem;
     --container-xl: 36rem;
     --container-2xl: 42rem;
     --container-4xl: 56rem;
@@ -114,6 +116,7 @@
       --color-gray-500: lab(47.7841% -.393212 -10.0268);
       --color-gray-600: lab(35.6337% -1.58697 -10.8425);
       --color-gray-700: lab(27.1134% -.956401 -12.3224);
+      --color-gray-800: lab(16.1051% -1.18239 -11.7533);
       --color-gray-900: lab(8.11897% .811279 -12.254);
     }
   }
@@ -535,6 +538,10 @@
     max-width: 70%;
   }
 
+  .max-w-md {
+    max-width: var(--container-md);
+  }
+
   .max-w-xl {
     max-width: var(--container-xl);
   }
@@ -794,6 +801,10 @@
     padding-block: calc(var(--spacing) * 6);
   }
 
+  .py-10 {
+    padding-block: calc(var(--spacing) * 10);
+  }
+
   .py-16 {
     padding-block: calc(var(--spacing) * 16);
   }
@@ -897,6 +908,10 @@
     color: var(--color-gray-700);
   }
 
+  .text-gray-800 {
+    color: var(--color-gray-800);
+  }
+
   .text-green-400 {
     color: var(--color-green-400);
   }
@@ -923,6 +938,10 @@
 
   .text-white {
     color: var(--color-white);
+  }
+
+  .uppercase {
+    text-transform: uppercase;
   }
 
   .shadow {

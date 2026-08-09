@@ -6,10 +6,10 @@ type User = {
   id: number;
   name: string;
   email: string;
-  phone?: string;
-  village?: string;
+  phone?: string | null;
+  village?: string | null;
   address?: string | null;
-  role?: string;
+  role?: string | null;
   createdAt?: string;
 };
 
@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -25,180 +26,260 @@ export default function ProfilePage() {
     address: "",
   });
 
- useEffect(() => {
-  const loadUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  // =========================
+  // LOAD PROFILE
+  // =========================
 
-      console.log("PROFILE TOKEN:", token);
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-      if (!token) {
-        console.log("❌ NO TOKEN FOUND");
-        setLoading(false);
-        return;
-      }
+        console.log("PROFILE TOKEN:", token);
 
-      const response = await fetch(
-        "https://agriconnect-x8no.onrender.com/me",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+        // No token
+        if (!token) {
+          console.log("❌ NO TOKEN FOUND");
+          setError("Please login again.");
+          setLoading(false);
+          return;
         }
-      );
 
-      console.log("ME API STATUS:", response.status);
+        // Fetch user
+        const response = await fetch(
+          "https://agriconnect-x8no.onrender.com/me",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      const data = await response.json();
+        console.log("ME API STATUS:", response.status);
 
-      console.log("ME API RESPONSE:", data);
+        const data = await response.json();
 
-      if (!response.ok) {
-        console.error("❌ PROFILE API ERROR:", data);
+        console.log("ME API RESPONSE:", data);
+
+        // API error
+        if (!response.ok) {
+          console.error("❌ PROFILE API ERROR:", data);
+
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setError("Session expired. Please login again.");
+          } else {
+            setError(data.message || "Failed to load profile.");
+          }
+
+          setLoading(false);
+          return;
+        }
+
+        // =========================
+        // HANDLE USER RESPONSE
+        // =========================
+
+        // If API returns { user: {...} }
+        const userData = data.user || data;
+
+        console.log("FINAL USER DATA:", userData);
+
+        setUser(userData);
+
+        setForm({
+          name: userData.name || "",
+          phone: userData.phone || "",
+          village: userData.village || "",
+          address: userData.address || "",
+        });
+
+        localStorage.setItem("user", JSON.stringify(userData));
+
         setLoading(false);
-        return;
+      } catch (error) {
+        console.error("❌ PROFILE ERROR:", error);
+
+        setError(
+          "Unable to connect to server. Please refresh and try again."
+        );
+
+        setLoading(false);
       }
+    };
 
-      setUser(data);
+    loadUser();
+  }, []);
 
-      setForm({
-        name: data.name || "",
-        phone: data.phone || "",
-        village: data.village || "",
-        address: data.address || "",
-      });
+  // =========================
+  // INPUT CHANGE
+  // =========================
 
-      localStorage.setItem("user", JSON.stringify(data));
-
-      setLoading(false);
-
-    } catch (error) {
-      console.error("❌ PROFILE ERROR:", error);
-      setLoading(false);
-    }
-  };
-
-  loadUser();
-}, []);
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  setForm({
-    ...form,
-    [e.target.name]: e.target.value,
-  });
-};
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
 
- const handleSave = async () => {
-  if (!user) return;
+  // =========================
+  // SAVE PROFILE
+  // =========================
 
-  try {
-    const token = localStorage.getItem("token");
+  const handleSave = async () => {
+    if (!user) return;
 
-    if (!token) {
-      alert("Please login again.");
-      return;
-    }
+    try {
+      const token = localStorage.getItem("token");
 
-    const response = await fetch(
-      "https://agriconnect-x8no.onrender.com/me",
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: form.name,
-          phone: form.phone,
-          village: form.village,
-          address: form.address,
-        }),
+      if (!token) {
+        alert("Please login again.");
+        return;
       }
-    );
 
-    const data = await response.json();
+      const response = await fetch(
+        "https://agriconnect-x8no.onrender.com/me",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name,
+            phone: form.phone,
+            village: form.village,
+            address: form.address,
+          }),
+        }
+      );
 
-    if (!response.ok) {
-      alert(data.message || "Failed to update profile");
-      return;
+      const data = await response.json();
+
+      console.log("UPDATE PROFILE RESPONSE:", data);
+
+      if (!response.ok) {
+        alert(data.message || "Failed to update profile.");
+        return;
+      }
+
+      // API may return { user: {...} } or directly {...}
+      const updatedUser = data.user || data;
+
+      setUser(updatedUser);
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(updatedUser)
+      );
+
+      setEditing(false);
+
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("PROFILE UPDATE ERROR:", error);
+
+      alert(
+        "Something went wrong while updating profile."
+      );
     }
+  };
 
-    setUser(data.user);
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
-    );
-
-    setEditing(false);
-
-    alert("Profile updated successfully!");
-
-  } catch (error) {
-    console.error("PROFILE UPDATE ERROR:", error);
-    alert("Something went wrong while updating profile.");
-  }
-};
+  // =========================
+  // LOADING
+  // =========================
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-lg text-gray-600">
-          Loading profile...
-        </p>
-      </main>
-    );
-  }
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow text-center">
+          <div className="text-2xl font-bold text-green-600">
+            Loading profile...
+          </div>
 
-  if (!user) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">
-            User not found
-          </h1>
-
-          <p className="mt-2 text-gray-600">
-            Please login again to view your profile.
+          <p className="text-gray-500 mt-2">
+            Please wait
           </p>
         </div>
       </main>
     );
   }
 
+  // =========================
+  // ERROR
+  // =========================
+
+  if (!user) {
+    return (
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow text-center max-w-md">
+          <h1 className="text-2xl font-bold text-red-600">
+            Profile Not Found
+          </h1>
+
+          <p className="mt-3 text-gray-600">
+            {error || "Please login again to view your profile."}
+          </p>
+
+          <button
+            onClick={() => {
+              window.location.href = "/login";
+            }}
+            className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // =========================
+  // PROFILE PAGE
+  // =========================
+
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4">
+    <main className="min-h-screen bg-gray-100 py-10 px-4">
+
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-        {/* HEADER */}
+        {/* ================= HEADER ================= */}
+
         <div className="text-center mb-8">
 
-          <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold">
-            {user.name?.charAt(0).toUpperCase() || "U"}
+          {/* PROFILE INITIAL */}
+
+          <div className="w-24 h-24 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold shadow">
+            {user.name
+              ? user.name.charAt(0).toUpperCase()
+              : "U"}
           </div>
+
+          {/* NAME */}
 
           <h1 className="text-3xl font-bold mt-4 text-gray-800">
             {user.name || "User"}
           </h1>
 
-          <p className="text-gray-500 mt-1 uppercase">
-            {user.role || "User"}
+          {/* ROLE */}
+
+          <p className="text-gray-500 mt-1 uppercase font-semibold">
+            {user.role || "USER"}
           </p>
 
         </div>
 
-        {/* DETAILS */}
+        {/* ================= DETAILS ================= */}
+
         <div className="space-y-5">
 
           {/* NAME */}
+
           <div>
             <label className="font-semibold text-gray-700">
               Name
@@ -206,10 +287,12 @@ const handleChange = (
 
             {editing ? (
               <input
+                type="text"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full border rounded-lg p-3 mt-1 text-black"
+                className="w-full border rounded-lg p-3 mt-1 text-black bg-white"
+                placeholder="Enter your name"
               />
             ) : (
               <p className="border rounded-lg p-3 mt-1 text-gray-700">
@@ -219,6 +302,7 @@ const handleChange = (
           </div>
 
           {/* EMAIL */}
+
           <div>
             <label className="font-semibold text-gray-700">
               Email
@@ -230,6 +314,7 @@ const handleChange = (
           </div>
 
           {/* PHONE */}
+
           <div>
             <label className="font-semibold text-gray-700">
               Phone
@@ -237,10 +322,11 @@ const handleChange = (
 
             {editing ? (
               <input
+                type="tel"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                className="w-full border rounded-lg p-3 mt-1 text-black"
+                className="w-full border rounded-lg p-3 mt-1 text-black bg-white"
                 placeholder="Enter phone number"
               />
             ) : (
@@ -251,6 +337,7 @@ const handleChange = (
           </div>
 
           {/* VILLAGE */}
+
           <div>
             <label className="font-semibold text-gray-700">
               Village
@@ -258,10 +345,11 @@ const handleChange = (
 
             {editing ? (
               <input
+                type="text"
                 name="village"
                 value={form.village}
                 onChange={handleChange}
-                className="w-full border rounded-lg p-3 mt-1 text-black"
+                className="w-full border rounded-lg p-3 mt-1 text-black bg-white"
                 placeholder="Enter village"
               />
             ) : (
@@ -272,6 +360,7 @@ const handleChange = (
           </div>
 
           {/* ADDRESS */}
+
           <div>
             <label className="font-semibold text-gray-700">
               Address
@@ -279,10 +368,11 @@ const handleChange = (
 
             {editing ? (
               <input
+                type="text"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                className="w-full border rounded-lg p-3 mt-1 text-black"
+                className="w-full border rounded-lg p-3 mt-1 text-black bg-white"
                 placeholder="Enter address"
               />
             ) : (
@@ -292,17 +382,33 @@ const handleChange = (
             )}
           </div>
 
-          {/* BUTTON */}
+          {/* ROLE */}
+
+          <div>
+            <label className="font-semibold text-gray-700">
+              Account Type
+            </label>
+
+            <p className="border rounded-lg p-3 mt-1 bg-gray-100 text-gray-700 uppercase">
+              {user.role || "USER"}
+            </p>
+          </div>
+
+          {/* ================= BUTTONS ================= */}
+
           <div className="pt-4">
 
             {!editing ? (
+
               <button
                 onClick={() => setEditing(true)}
                 className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
               >
                 Edit Profile
               </button>
+
             ) : (
+
               <div className="flex gap-3">
 
                 <button
@@ -313,19 +419,31 @@ const handleChange = (
                 </button>
 
                 <button
-                  onClick={() => setEditing(false)}
+                  onClick={() => {
+                    setEditing(false);
+
+                    setForm({
+                      name: user.name || "",
+                      phone: user.phone || "",
+                      village: user.village || "",
+                      address: user.address || "",
+                    });
+                  }}
                   className="flex-1 bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600"
                 >
                   Cancel
                 </button>
 
               </div>
+
             )}
 
           </div>
 
         </div>
+
       </div>
+
     </main>
   );
 }

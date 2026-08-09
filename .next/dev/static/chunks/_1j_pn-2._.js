@@ -19,13 +19,42 @@ function Login() {
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Login.useEffect": ()=>{
-            const params = new URLSearchParams(window.location.search);
-            const token = params.get("token");
-            if (token) {
-                localStorage.setItem("token", token);
-                alert("Google Login Successful!");
-                router.push("/dashboard");
-            }
+            const handleGoogleLogin = {
+                "Login.useEffect.handleGoogleLogin": async ()=>{
+                    const params = new URLSearchParams(window.location.search);
+                    const token = params.get("token");
+                    if (!token) return;
+                    try {
+                        // Save Google JWT
+                        localStorage.setItem("token", token);
+                        // Get logged-in user from backend
+                        const response = await fetch("https://agriconnect-x8no.onrender.com/me", {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json"
+                            }
+                        });
+                        if (!response.ok) {
+                            console.error("Google user fetch failed:", response.status);
+                            alert("Google Login failed");
+                            return;
+                        }
+                        const user = await response.json();
+                        console.log("GOOGLE USER:", user);
+                        // Save user
+                        localStorage.setItem("user", JSON.stringify(user));
+                        alert("Google Login Successful!");
+                        // Remove token from URL
+                        window.history.replaceState({}, document.title, "/login");
+                        router.push("/dashboard");
+                    } catch (error) {
+                        console.error("Google Login Error:", error);
+                        alert("Something went wrong with Google Login");
+                    }
+                }
+            }["Login.useEffect.handleGoogleLogin"];
+            handleGoogleLogin();
         }
     }["Login.useEffect"], [
         router
@@ -49,8 +78,9 @@ function Login() {
             console.log("TOKEN:", !!data.token);
             if (response.ok) {
                 localStorage.setItem("token", data.token);
-                // Save user details
-                localStorage.setItem("user", JSON.stringify(data.user));
+                if (data.user) {
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                }
                 alert("Login Successful!");
                 router.push("/dashboard");
             } else {
@@ -71,7 +101,7 @@ function Login() {
                     children: "Login"
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 64,
+                    lineNumber: 105,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -79,7 +109,7 @@ function Login() {
                     children: "Login to access your AgriConnect account"
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 68,
+                    lineNumber: 109,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -93,7 +123,7 @@ function Login() {
                     className: "w-full mt-6 p-2 border border-gray-600 bg-gray-900 text-white rounded"
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 72,
+                    lineNumber: 113,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -107,7 +137,7 @@ function Login() {
                     className: "w-full mt-4 p-2 border border-gray-600 bg-gray-900 text-white rounded"
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 82,
+                    lineNumber: 123,
                     columnNumber: 4
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -116,7 +146,7 @@ function Login() {
                     children: "Login"
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 92,
+                    lineNumber: 133,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -126,12 +156,12 @@ function Login() {
                         children: "Continue with Google"
                     }, void 0, false, {
                         fileName: "[project]/app/login/page.tsx",
-                        lineNumber: 100,
+                        lineNumber: 141,
                         columnNumber: 3
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 99,
+                    lineNumber: 140,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -145,24 +175,24 @@ function Login() {
                             children: "Register"
                         }, void 0, false, {
                             fileName: "[project]/app/login/page.tsx",
-                            lineNumber: 107,
+                            lineNumber: 148,
                             columnNumber: 3
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/login/page.tsx",
-                    lineNumber: 105,
+                    lineNumber: 146,
                     columnNumber: 6
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/login/page.tsx",
-            lineNumber: 62,
+            lineNumber: 103,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/login/page.tsx",
-        lineNumber: 60,
+        lineNumber: 101,
         columnNumber: 5
     }, this);
 }
